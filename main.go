@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"golang_crud/controllers"
 	"golang_crud/database"
+	"golang_crud/routes"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -22,14 +23,7 @@ func main() {
 
 	api := r.Group("/api/v1")
 	{
-		product := api.Group("/product")
-		{
-			product.GET("/", controllers.GetAllProduct)
-			product.POST("/", controllers.CreateProduct)
-			product.GET("/:id", controllers.GetProductById)
-			product.PUT("/:id", controllers.UpdateProduct)
-			product.DELETE("/:id", controllers.DeleteProduct)
-		}
+		routes.ProductRoutes(api.Group(""), &controllers.ProductController{})
 		category := api.Group("/category")
 		{
 			category.POST("/", controllers.CreateCategory)

@@ -3,6 +3,7 @@ package controllers
 import (
 	"golang_crud/database"
 	"golang_crud/models"
+	"golang_crud/services"
 	"golang_crud/utils"
 	"net/http"
 	"os"
@@ -10,6 +11,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+type ProductController struct {
+	svc *services.ProductService
+}
+
+func NewProductController(svc *services.ProductService) *ProductController {
+	return &ProductController{svc: svc}
+}
 
 func CreateProduct(c *gin.Context) {
 
@@ -33,21 +42,13 @@ func CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, models.BaseResponse{Status: http.StatusCreated, Message: "Sukses create product", Data: product})
 }
 
-func GetAllProduct(c *gin.Context) {
-	var products []models.Product
-
-	result := database.DB.Preload("Category").Find(&products)
-
-	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.NotFound, "message": "Product not found"})
-		return
-	}
-
+func (ctrl *ProductController) GetAllProduct(c *gin.Context) {
 	key := []byte(os.Getenv("KEY_CRYPTO"))
-	for i := range products {
-		products[i].SecretNote = utils.Decrypt(key, products[i].SecretNote)
-	}
+	products, err := ctrl.svc.FindAll(key)
 
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
 	c.JSON(http.StatusOK, models.BaseResponse{Status: http.StatusOK, Message: "Success get All product", Data: products})
 }
 

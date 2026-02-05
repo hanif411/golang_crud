@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 func ConnectDatabase() {
 
-	dsn := "root:kaoskaki@tcp(127.0.0.1:3306)/go_secure_db?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:kaoskaki@tcp(host.docker.internal:3306)/go_secure_db?charset=utf8mb4&parseTime=True&loc=Local"
 	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
